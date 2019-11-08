@@ -1,12 +1,18 @@
 # Calcudis Authentication Server
-## Installation and launch
+## Getting started
+### Install the dependencies
 ```bash
 npm install
-sqlite3 data.db < schema.sql
-npm run start
 ```
-
-## Generate a pair of keys
+### Create the database
+```bash
+sqlite3 data.db < schema.sql
+```
+### Generate a pair of keys
 ```bash
 ssh-keygen -o -b 4096 -t rsa
+```
+### Start the server
+```bash
+npm run start
 ```
