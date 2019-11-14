@@ -15,7 +15,6 @@ router.post('/login', async function (req, res, next) {
     if (row) {
       let token = 'ERROR';
       try {
-        // sign with RSA SHA256
         const privateKey = fs.readFileSync('id_rsa.key');
         token = jwt.sign(
           {
@@ -32,6 +31,8 @@ router.post('/login', async function (req, res, next) {
           });
       } catch (e) {
         console.error(e);
+        res.status(500);
+        res.send(JSON.stringify({ message: 'Internal error while signing the token.' }));
       }
       res.status(200);
       res.send(JSON.stringify({ token }));
@@ -42,6 +43,18 @@ router.post('/login', async function (req, res, next) {
   } catch (err) {
     res.status(500);
     res.send('Internal server error.');
+  }
+});
+
+router.get('/publickey', function (req, res, next) {
+  res.setHeader('Content-type', 'application/json');
+  const public = fs.readFileSync('id_rsa.pub.key');
+  if (public && public.length > 0) {
+    res.status(200);
+    res.send(JSON.stringify({ key: public.toString('UTF8') }));
+  } else {
+    res.status(500);
+    res.send(JSON.stringify({ message: 'Internal error while retrieving key.' }))
   }
 });
 
