@@ -16,16 +16,19 @@ router.post('/login', async function (req, res, next) {
     if (row) {
       let token = 'ERROR';
       try {
-        const privateKey = fs.readFileSync('id_rsa.key');
+        const privateKey = fs.readFileSync('private.pem');
         token = jwt.sign(
           {
             name: row.username,
             email: row.email,
             type: row.type
           },
-          privateKey,
           {
-            algorithm: 'HS256',
+            key: privateKey,
+            passphrase: '1234'
+          },
+          {
+            algorithm: 'RS256',
             issuer: 'monsieurleserveurdauthentification',
             audience: row.type,
             expiresIn: '1d'
@@ -33,13 +36,13 @@ router.post('/login', async function (req, res, next) {
       } catch (e) {
         console.error(e);
         res.status(500);
-        res.send(JSON.stringify({ message: 'Internal error while signing the token.' }));
+        return res.send(JSON.stringify({ message: 'Internal error while signing the token.' }));
       }
       res.status(200);
-      res.send(JSON.stringify({ token }));
+      return res.send(JSON.stringify({ token }));
     } else {
       res.status(400);
-      res.send(JSON.stringify({ message: 'Bad username/password combination.' }));
+      return res.send(JSON.stringify({ message: 'Bad username/password combination.' }));
     }
   } catch (err) {
     res.status(500);
@@ -49,7 +52,7 @@ router.post('/login', async function (req, res, next) {
 
 router.get('/publickey', function (req, res, next) {
   res.setHeader('Content-type', 'application/json');
-  const public = utility.strip(fs.readFileSync('id_rsa.pub.key').toString('UTF-8'));
+  const public = utility.strip(fs.readFileSync('public.pem').toString('UTF-8'));
   if (public && public.length > 0) {
     res.status(200);
     res.send(JSON.stringify({ key: public.toString('UTF8') }));

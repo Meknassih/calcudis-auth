@@ -15,8 +15,10 @@ For an other OS, check out the [official SQLite download page](https://sqlite.or
 sqlite3 data.db < schema.sql
 ```
 ### Generate a pair of keys
+**Be sure to use the passphrase** `1234` when prompted while generating the key pair below.
 ```bash
-ssh-keygen -o -b 4096 -t rsa
+openssl genrsa -des3 -out private.pem 2048
+openssl rsa -in private.pem -outform PEM -pubout -out public.pem
 ```
 ### Start the server
 ```bash
