@@ -2,6 +2,7 @@ const sqlite = require('sqlite');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const utility = require('../utility');
 const router = express.Router();
 const openDb = sqlite.open('./data.db', { Promise });
 
@@ -48,7 +49,7 @@ router.post('/login', async function (req, res, next) {
 
 router.get('/publickey', function (req, res, next) {
   res.setHeader('Content-type', 'application/json');
-  const public = fs.readFileSync('id_rsa.pub.key');
+  const public = utility.strip(fs.readFileSync('id_rsa.pub.key').toString('UTF-8'));
   if (public && public.length > 0) {
     res.status(200);
     res.send(JSON.stringify({ key: public.toString('UTF8') }));
